@@ -55,5 +55,11 @@ public class User {
 		this.messages = messages;
 	}
 	
+	public void addMessage(String message) {
+		this.messages.add(message);
+	}
 	
+	public void addFriend(String friendName) {
+		this.friends.add(friendName);
+	}
 }

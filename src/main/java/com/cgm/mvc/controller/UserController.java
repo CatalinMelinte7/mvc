@@ -24,21 +24,28 @@ public class UserController {
 	@RequestMapping(value = "/friends", method = RequestMethod.GET)
 	protected @ResponseBody ModelAndView getUsers() throws Exception {
 			Map model = new HashMap();
-			model.put("users", ListUsers.getUsers());
+			model.put("users", ListUsers.users);
 			return new ModelAndView("friends", model);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/friends", method = RequestMethod.POST)
-	protected ModelAndView follow(@ModelAttribute("friend") User friend, HttpServletRequest request, Map model) {
-		model.put("friends", new User());
-		return new ModelAndView("redirect:/main", model);
+	protected ModelAndView follow(@ModelAttribute("friend") User friend, HttpServletRequest request) {
+		User user = (User)request.getSession().getAttribute("LOGGEDIN_USER");
+
+		for(User u : ListUsers.users) {
+			if((u.getUsername()).equals(user.getUsername())) {
+				u.addFriend(user.getUsername());
+			}
+		}
+		
+		return new ModelAndView("redirect:/main");
 	}
 	
 	private List<String> friendsMessages(List<String> friends){
 		List<String> messages = new ArrayList<String>();
 		for(String friend : friends) {
-			for(User user : ListUsers.getUsers()) {
+			for(User user : ListUsers.users) {
 				if(user.getUsername().equals(friend)) {
 					messages.addAll(user.getMessages());
 				}
@@ -52,7 +59,7 @@ public class UserController {
 	@ResponseBody
 	protected ModelAndView getUserMessages(HttpServletRequest request) throws Exception{
 		User user = (User)request.getSession().getAttribute("LOGGEDIN_USER");
-		List<User> users = ListUsers.getUsers();
+		List<User> users = ListUsers.users;
 		if(user != null) {
 			Map model = new HashMap();
 			model.put("username", user.getUsername());
